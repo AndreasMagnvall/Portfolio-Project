@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block body %}
+<script>
+$(document).ready(function(){
+  $("#showbutton").click(function(){
+    $("#hiddenfirst").show(100);
+    $(this).wrap('<a href={{ url_for("list") }} />');
+    $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+  });
+});
+</script>
+<link rel="stylesheet" href={{ url_for('static', filename='styles/main.css') }}>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-7 col-md-8 col-lg-9" id="mainpresentation" style="background-color:yellow;">
+      <h1>{{  user_info.header1 }}</h1>
+      {{  user_info.text1 }}
+    </div>
+    <img class="col-sm-5 col-md-4 col-lg-3" id="mainimage" src={{ url_for('static', filename='style/user') + "bigimage.png" }} alt="Projektet saknar bild" class="img-responsive" alt={{ user_info["bigimage"] }} style="background-image:url({{url_for('static', filename='style/placeholderbig.png')}}); background-size:100% 100%;">
+  </div>
+  <div class="row" id="bottompresentation" style="background-color:yellow;" >
+    <h1>{{  user_info.header2 }}</h1>
+    <p>{{  user_info.text2 }}</p>
+  </div>
+  <div class="row" id="bottomimages" style="background-color:yellow;" >
+
+    {% for link in user_info.links %}
+    <div class="col-lg-{{12 // user_info.links|length}} nopadding" >
+      <div class="bottomimage">
+        <a href={{"https://" + link}}>{{link}}</a>
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+<div class="container-fluid bg-3 text-center">
+  <h3>Some of my Work</h3><br>
+  <div class="row">
+    {% for project in projects[startindex:endindex] %}
+
+    <div class="col-sm-3">
+      <div class="hover_container">
+	<img src={{ url_for('static', filename='images/') + project["project_id"]|string +"/" + project["small_image"] }} class="img-responsive hover_image" style="background-image:url({{url_for('static', filename='style/placeholdersmall.png')}});" alt="No image found for this project">
+	<a href={{ "projects/" + project["project_id"]|string }}>
+	  <div class="hover_overlay">
+	    <div class="hover_text"><p style="font-size:large">{{ project["project_name"] }}</p> <br> <p style="font-size:medium vertical-align:middle">{{ project["short_description"] }}</p></div>
+	  </div>
+	</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div><br>
+
+
+  <div class="row" id="hiddenfirst">
+    {% for project in projects[endindex:endindex+4] %}
+
+    <div class="col-sm-3">
+      <div class="hover_container">
+	<img src={{ url_for('static', filename='images/') + project["project_id"]|string +"/" + project["small_image"] }} alt="No image found for this project" class="img-responsive hover_image" alt="Image" style="background-image:url({{url_for('static', filename='style/placeholdersmall.png')}});">
+	<a href={{ "projects/" + project["project_id"]|string }}>
+	  <div class="hover_overlay">
+	    <div class="hover_text"><p style="font-size:large">{{ project["project_name"] }}</p> <br> <p style="font-size:medium vertical-align:middle">{{ project["short_description"] }}</p></div>
+	  </div>
+	</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div><br>
+  <button id="showbutton">View more projects</button>
+</div>
+
+
+{% endblock %}

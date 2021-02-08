@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<script>
+//current projects showed
+var projects = []
+
+$(document).ready(function(){
+  //current techs selected
+  var techoptions = [];
+  //current sortfields selected
+  var sortoptions = [];
+  sendtoserver();
+  //Makes the dropdown work as it does. Enables the user to click multiple fields for example.
+  $(".dropdown-menu a").on( 'click', function( event ) {
+    console.log("test");
+    var $target = $( event.currentTarget ),
+    val = $target.attr( 'data-value' ),
+    $inp = $target.find( 'input' ),
+    idx;
+    var options = []
+    if($(this).attr('data-type') == "technique")
+    {
+      options = techoptions.slice();
+    }
+    else if ($(this).attr('data-type') == "sortfield")
+    {
+      options = sortoptions.slice();
+    }
+
+    if ( ( idx = options.indexOf( val ) ) > -1 ) {
+      options.splice( idx, 1 );
+      setTimeout( function() { $inp.prop( 'checked', false ) }, 0);
+    } else {
+      options.push( val );
+      setTimeout( function() { $inp.prop( 'checked', true ) }, 0);
+    }
+
+    $( event.target ).blur();
+    if($(this).attr('data-type') == "technique")
+    {
+      techoptions = options.slice();
+    }
+    else if($(this).attr('data-type') == "sortfield") {
+      sortoptions = options.slice();
+    }
+
+    sendtoserver();
+    return false;
+  });
+//show descending option as dropdown or not
+  var showdesc = true;
+  $("#orderbutton").on( 'click', function( event ) {
+    if(showdesc){
+      document.getElementById("orderbutton").innerHTML = "Descending" + ' <span class="glyphicon glyphicon-circle-arrow-down"></span>';
+      showdesc = false;
+    }
+    else{
+      document.getElementById("orderbutton").innerHTML = "Ascending" + ' <span class="glyphicon glyphicon-circle-arrow-up"></span>';
+      showdesc = true;
+    }
+    sendtoserver();
+  });
+
+  //when user changes the searchfield a new search query request is sent to the server
+  $("#searchfield").keyup(function(event)
+  {
+    sendtoserver();
+  });
+
+    //sends a post request to the servers with the parameters checked by the user
+  function sendtoserver()
+  {
+    var fields = {"techniques":techoptions,"search_fields":sortoptions};
+    var data = {
+      data: JSON.stringify({
+        "search":document.getElementById("searchfield").value,
+        "techniques": fields.techniques,
+        "search_fields": fields.search_fields
+      })
+    }
+    $.ajax({
+      url: '/get_search_fields',
+      type: 'POST',
+      data: data,
+
+      success: function(response) {
+        projects = response;
+        drawsearchresults(projects);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  }
+
+  //Draws the results returned from the server. Doesnt use jinja like other pages.
+  function drawsearchresults(projects){
+    $("#row1").empty();
+
+    if(document.getElementById("orderbutton").innerHTML.indexOf("Descending") != -1)
+    {
+      projects.reverse();
+    }
+    for(var i = 0;i < projects.length;i++)
+    {
+      console.log(projects);
+      $("#row1").append('<div class="col-sm-3">' +
+        '<div class="hover_container">' +
+        '<img src={{ url_for('static', filename='images/')}}' + projects[i]["project_id"].toString() +"/" + projects[i]["small_image"] + ' class="hover_image img-responsive" style="width:100%; background-image:url({{url_for('static', filename='style/placeholdersmall.png')}});" alt="Image">'+ '<a href=' + "projects/" + projects[i]["project_id"].toString() + '>' +
+        '<div class="hover_overlay">' +
+        '<div class="hover_text">' +
+        '<p style="font-size:large">' + projects[i]["project_name"] + '</p>' +
+        '<br>' +
+        '<p style="font-size:medium vertical-align:middle">' + projects[i]["short_description"] + '</p>' +
+        '</div>' +
+	'</div>' +
+        '</a>' +
+        '</div>' +
+      '</div>');
+    }
+  }
+  //clears input field and shows default search
+  $("#clearbutton").on( 'click', function( event ) {
+    document.getElementById("searchfield").value = "";
+    $("#row1").empty();
+    sendtoserver();
+  });
+});
+</script>
+
+<div class="container-fluid" >
+
+  <h2>Search Projects</h2>
+
+  <input id="searchfield" type="search" name="">
+  <button id="clearbutton">Clear
+  <span class="glyphicon glyphicon-remove-sign"></span></button>
+
+  <div class="row" style="max-width:500px; margin:0px" >
+    <div class="dropdown col-sm-3 nopadding">
+      <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Technique
+        <span class="caret"></span></button>
+        <ul class="dropdown-menu">
+          {% for technique in techniques %}
+          <li><a href="#" class="small test" data-type="technique" data-value="{{technique}}" tabIndex="-1"><input type="checkbox"/>&nbsp;{{technique}}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="dropdown col-sm-3 nopadding">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Search fields
+          <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            {% for key in key_list %}
+            <li><a href="#" class="small test" data-type="sortfield" data-value="{{key}}" tabIndex="-1"><input type="checkbox"/>&nbsp;{{key|replace("_", " ")}}</a></li>
+
+            {% endfor %}
+          </div>
+          <button id="orderbutton"  data-value="ascending" type="button" data-toggle="dropdown">Ascending
+          <span class="glyphicon glyphicon-circle-arrow-up"></span></button>
+        </div>
+      </div>
+      <div class="container-fluid bg-3 text-center">
+        <h3>Projects matching search fields:</h3><br>
+        <div class="row" id="row1">
+        </div><br>
+        {% endblock %}

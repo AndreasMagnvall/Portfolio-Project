@@ -1,0 +1,107 @@
+.navbar {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  border: 0;
+  border-radius: 0;
+  margin-bottom: 0;
+  font-size: 12px;
+  letter-spacing: 5px;
+}
+
+.navbar-nav li a:hover {
+  color: #1abc9c !important;
+}
+.container-fluid{
+    max-width: 80%;
+}
+
+@media only screen and (max-width:800px)
+{
+    .container-fluid{
+	max-width: none;
+    }
+}
+
+#hiddenfirst{
+    display: none;
+}
+
+#mainpresentation{
+    min-height: 600px;
+    border-style: solid;
+    border-width: 1px;
+}
+#bottompresentation{
+    min-height: 100px;
+    border-style: solid;
+    border-width: 1px;
+    border-top: None;
+}
+#mainimage{
+    min-height: 600px;
+    border-style: solid;
+    border-left: none;
+    border-width: 1px;
+}
+.bottomimage{
+    text-align: center;
+    border-style: solid;
+    border-width: 1px;
+    border-top: none;
+    height: 40px;
+    line-height: 40px;
+}
+.nopadding {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#bottomimages{
+  min-height:40px;
+}
+
+.hover_container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+
+.hover_image {
+    display: block;
+    width: 150px;
+    height: 150px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: gray;
+}
+
+.hover_overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    transition: .5s ease;
+    background-color: #008CBA;
+}
+
+.hover_container:hover .hover_overlay {
+    opacity: 0.5;
+}
+
+.hover_text {
+    color: white;
+    position: relative;
+    margin: auto;
+    text-align: center;
+}
+img{
+  background-repeat: no-repeat;
+}
+
+#searchfield{
+  min-width: 400px;
+}
